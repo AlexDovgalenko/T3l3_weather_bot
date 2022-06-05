@@ -1,16 +1,12 @@
 import logging
-import os
 import sqlite3
 from typing import Optional
 
-from dotenv import load_dotenv, find_dotenv
-
+from config import APP_DB_NAME, WEATHER_CACHE_TABLE_NAME
 from geocoding.geocoding_exceptions import GeneralGeocodingError, UnableToLocateCoordinates
 from geocoding.geocoding_utils import get_lat_lon_from_city_name
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToGetWeatherDataFromDB, \
     FailedToInsertWeatherDataIntoDB, FailedToUpdateWeatherDataInDB, FailedToUpdateWeatherCache
-from weather_providers.weather_provider_strategy import WeatherProviderName
-from config import APP_DB_NAME, WEATHER_CACHE_TABLE_NAME
 
 # load_dotenv(find_dotenv())
 
@@ -91,7 +87,7 @@ def update_weather_item_in_db(weather_provider_name: str, timestamp: int, period
         raise FailedToUpdateWeatherDataInDB("Failed to update weather data in the DB.")
 
 
-def check_weather_cache(city_name: str, weather_provider_name: WeatherProviderName, timestamp: int, period: str):
+def check_weather_cache(city_name: str, weather_provider_name: str, timestamp: int, period: str):
     """Function checks if combination of city location + weather provider record already exists in DB, and it is more
      than one hour old.
      Returns """

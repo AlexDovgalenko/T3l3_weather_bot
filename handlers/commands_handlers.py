@@ -1,6 +1,6 @@
 from aiogram import types
 
-from bot_init import dp, get_all_user_ids
+from bot_init import  get_all_user_ids
 from handlers.user_options_handlers import settings
 
 start_text = "<b>Оберіть назву населеного пункту...</b>"
@@ -10,7 +10,6 @@ about_text = """Цей бот дозволяє дізнатися <b>поточ�
 Щоб змінити <b>налаштування</b> бота оберіть відповідний пункт меню."""
 
 
-@dp.message_handler(commands='start')
 async def start(message: types.Message):
     chat_id = message.chat.id
     if chat_id in get_all_user_ids():
@@ -22,7 +21,6 @@ async def start(message: types.Message):
         await settings(message=message)
 
 
-@dp.message_handler(commands='about')
 async def about(message: types.Message):
     await message.delete()
     await message.reply(text=about_text, allow_sending_without_reply=True)

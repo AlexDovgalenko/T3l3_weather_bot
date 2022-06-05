@@ -17,14 +17,14 @@ BOT_HASH = os.environ.get("BOT_HASH")
 WEATHER_PROVIDER = OpenWeatherMapStrategy()
 
 
-def reply_current_weather_result(update: Update, context: CallbackContext):
-    chat_id = update.message.chat_id
-    message_id = update.message.message_id
-    weather_text = compile_current_weather_output(city_name=update.message.text, weather_provider=WEATHER_PROVIDER)
-    # keyboard = [[KeyboardButton(text="Оберіть назву населеного пункту...")]]
-    # reply_markup = ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True, one_time_keyboard=True,)
-    # reply_markup = InlineKeyboardMarkup(keyboard)=
-    context.bot.send_message(text=weather_text, chat_id=chat_id, parse_mode=ParseMode.HTML)
+# def reply_current_weather_result(update: Update, context: CallbackContext):
+#     chat_id = update.message.chat_id
+#     message_id = update.message.message_id
+#     weather_text = compile_current_weather_output(city_name=update.message.text, weather_provider=WEATHER_PROVIDER)
+#     # keyboard = [[KeyboardButton(text="Оберіть назву населеного пункту...")]]
+#     # reply_markup = ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True, one_time_keyboard=True,)
+#     # reply_markup = InlineKeyboardMarkup(keyboard)=
+#     context.bot.send_message(text=weather_text, chat_id=chat_id, parse_mode=ParseMode.HTML)
 
 
 def start(update: Update, _: CallbackContext) -> None:

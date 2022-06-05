@@ -9,7 +9,7 @@ from typing import Optional, Union
 import requests
 from dotenv import load_dotenv
 
-from geocoding import get_lat_lon_from_city_name
+from geocoding.geocoding_utils import get_lat_lon_from_city_name
 from weather_providers.weather_provider_strategy import WeatherProviderStrategy, WeatherData, ForecastPeriod, \
     WeatherProviderName
 
