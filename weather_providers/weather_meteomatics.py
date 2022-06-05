@@ -24,7 +24,6 @@ parameters = "wind_speed_10m:ms,wind_dir_10m:d,t_2m:C,msl_pressure:hPa,weather_s
 
 
 class MeteomaticsStrategy(WeatherProviderStrategy):
-
     provider_name = WeatherProviderName.METEOMATICS
     base_url = "api.meteomatics.com"
 
@@ -43,18 +42,16 @@ class MeteomaticsStrategy(WeatherProviderStrategy):
             return None
         return response.json()
 
-
-    def get_weather_data(self, city_name: str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Union[WeatherData, str]:
+    def fetch_weather_data(self, city_name: str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Union[
+        WeatherData, str]:
         pass
-
 
     def _parse_current_weather(self, city_name, weather_response: dict):
         pass
-
 
     def _parse_weather_forecast(self, city_name, weather_response: dict):
         pass
 
 
 if __name__ == '__main__':
-    pprint(get_weather_response("London"))
+    pass

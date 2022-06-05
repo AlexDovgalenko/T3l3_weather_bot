@@ -1,16 +1,47 @@
 from abc import abstractmethod, ABC
+from dataclasses import dataclass
+from enum import Enum
 from typing import Optional, Union
 
-from main import WeatherData
-from weather_providers.weather_openweathermap import ForecastPeriod
+
+class WeatherProviderName(Enum):
+    OPENWEATHERMAP = "Openweathermap"
+    METEOMATICS = "Meteomatics"
+    SINOPTIC = "Sinoptik"
+
+
+class ForecastPeriod(Enum):
+    """Class stores period option for query weather"""
+    CURRENT: str = "current"
+    FORECAST: str = "forecast"
+
+
+@dataclass
+class WeatherData:
+    city_name: str
+    lat_lon: Optional[str]
+    timestamp: str
+    date: str
+    weather_emoji: str
+    weather_summary: str
+    temperature: Optional[str]
+    max_temperature: Optional[str]
+    min_temperature: Optional[str]
+    wind_speed: str
+    wind_direction: Optional[str]
+    pressure: str
+    precipitation: Optional[str]
+    humidity: Optional[str]
+    sunrise: Optional[str]
+    sunset: Optional[str]
 
 
 class WeatherProviderStrategy(ABC):
-
-    provider_name: str
+    provider_name: WeatherProviderName
+    base_url: str
 
     @abstractmethod
-    def __get_weather_response(self, city_name: str) -> Optional[dict]:
+    def _get_weather_response(self, city_name: str) -> Optional[dict]:
         """ Method gets weather response from sertain weather API resource
 
         :param city_name: Name of the city to find out weather
@@ -18,14 +49,14 @@ class WeatherProviderStrategy(ABC):
         """
 
     @abstractmethod
-    def get_weather_data(self, city_name: str, period_option: Optional[ForecastPeriod] = ForecastPeriod.CURRENT) -> Union[
-            "WeatherData", str]:
+    def fetch_weather_data(self, city_name: str, period_option: "ForecastPeriod" = ForecastPeriod.CURRENT) -> \
+            Union["WeatherData", str]:
         pass
 
     @abstractmethod
-    def __parse_current_weather(self, city_name, weather_response: dict):
+    def _parse_current_weather(self, city_name, weather_response: dict):
         pass
 
     @abstractmethod
-    def __parse_weather_forecast(self, city_name, weather_response: dict):
+    def _parse_weather_forecast(self, city_name, weather_response: dict):
         pass
