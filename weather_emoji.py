@@ -2,6 +2,8 @@ from enum import Enum
 from pprint import pprint
 from typing import Optional, Tuple
 
+from weather_providers.weather_provider_strategy import WeatherProviderName
+
 WEATHER_EMOJI = {
     "CLEAR_SKY": ("\U00002600", "Ясно", "Clear"),
     "CLOUDS": ("\U00002601", "Хмарно", "Cloudy"),
@@ -37,9 +39,9 @@ class MetromaticsWeatherConditionsCodeRanges(Enum):
 
 
 def get_weather_emojy(weather_provider_name: "str", weather_code: int) -> Optional[Tuple[str]]:
-    if weather_provider_name == "openweathermap":
+    if weather_provider_name == WeatherProviderName.OPENWEATHERMAP.value:
         emoji_class = OpenweathermapWeatherConditionsCodeRanges
-    elif weather_provider_name == "meteomatics":
+    elif weather_provider_name == WeatherProviderName.METEOMATICS.value:
         emoji_class = MetromaticsWeatherConditionsCodeRanges
     else:
         return None
