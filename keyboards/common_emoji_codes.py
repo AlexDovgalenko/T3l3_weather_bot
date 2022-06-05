@@ -1,0 +1,7 @@
+options_emoji = "\U0001F6E0"
+weather_forecast_emoji = "\U0001F324"
+poop_emoji = "\U0001F4A9"
+empty_cell_emoji = "\U00002065"
+crossed_flags_emoji = "\U0001F38C"
+ua_flag_emoji = "\U0001F1FA\U0001F1E6"
+us_flag_emoji = "\U0001F1FA\U0001F1F8"
