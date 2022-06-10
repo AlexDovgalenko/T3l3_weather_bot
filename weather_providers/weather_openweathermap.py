@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union, List, Tuple
+from typing import Optional, List, Tuple
 
 import requests
 from dotenv import load_dotenv
@@ -32,7 +32,6 @@ class Language(Enum):
 
 
 class OpenWeatherMapStrategy(WeatherProviderStrategy):
-
     provider_name = WeatherProviderName.OPENWEATHERMAP.value
     base_url = "api.openweathermap.org"
 
@@ -59,7 +58,8 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
             return None
         return json.loads(response.text), "-".join([latitude, longitude])
 
-    def fetch_weather_data(self, city_name: str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Optional[WeatherData]:
+    def fetch_weather_data(self, city_name: str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Optional[
+        WeatherData]:
 
         response = self._get_weather_response(city_name)
         # err_msg = f"\U0001F4A9 Не вдалося отримати данні по населеному пункту **<b> {city_name} **</b>\n" \
@@ -104,8 +104,10 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
                 pressure=hpa_to_mm_hg_converter(weather_response[0]["current"].get("pressure")),
                 precipitation=weather_response[0]["current"].get("precipitation"),
                 humidity=weather_response[0]["current"].get("humidity"),
-                sunrise=datetime.fromtimestamp(weather_response[0]["current"].get("sunrise")).strftime("%Y-%m-%d %H:%M:%S"),
-                sunset=datetime.fromtimestamp(weather_response[0]["current"].get("sunset")).strftime("%Y-%m-%d %H:%M:%S")
+                sunrise=datetime.fromtimestamp(weather_response[0]["current"].get("sunrise")).strftime(
+                    "%Y-%m-%d %H:%M:%S"),
+                sunset=datetime.fromtimestamp(weather_response[0]["current"].get("sunset")).strftime(
+                    "%Y-%m-%d %H:%M:%S")
             )
         except Exception as err:
             logger.error(f"Failed to parse weather response because of following error:\n{err}")
@@ -136,9 +138,11 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
                     pressure=hpa_to_mm_hg_converter(weather_response[0]['daily'][item].get("pressure")),
                     precipitation=weather_response[0]['daily'][item].get("precipitation"),
                     humidity=weather_response[0]['daily'][item].get("humidity"),
-                    sunrise=datetime.fromtimestamp(weather_response[0]['daily'][item].get("sunrise")).strftime("%Y-%m-%d %H:%M:%S"),
-                    sunset=datetime.fromtimestamp(weather_response[0]['daily'][item].get("sunset")).strftime("%Y-%m-%d %H:%M:%S")
-                                                  )
+                    sunrise=datetime.fromtimestamp(weather_response[0]['daily'][item].get("sunrise")).strftime(
+                        "%Y-%m-%d %H:%M:%S"),
+                    sunset=datetime.fromtimestamp(weather_response[0]['daily'][item].get("sunset")).strftime(
+                        "%Y-%m-%d %H:%M:%S")
+                )
 
                 weather_data_list.append(weather_data)
         except Exception as err:

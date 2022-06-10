@@ -1,6 +1,6 @@
 from aiogram import types
 
-from bot_init import  get_all_user_ids
+from bot_init import get_all_user_ids
 from handlers.user_options_handlers import settings
 
 start_text = "<b>Оберіть назву населеного пункту...</b>"
@@ -29,4 +29,3 @@ async def about(message: types.Message):
 def register_commands_handlers(dispatcher: "Dispatcher"):
     dispatcher.register_message_handler(start, commands="start")
     dispatcher.register_message_handler(about, commands="about")
-

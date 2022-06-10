@@ -17,7 +17,8 @@ async def weather_choice_handler(callback_query: types.CallbackQuery):
     chat_id = callback_query.message.chat.id
     user_data = get_user_data(chat_id)
     if callback_query.data == "_forecast_weather_current":
-        weather_text = compile_current_weather_output(city_name=callback_query.message.text, weather_provider_name=user_data[2])
+        weather_text = compile_current_weather_output(city_name=callback_query.message.text,
+                                                      weather_provider_name=user_data[2])
         await callback_query.bot.send_message(text=weather_text, chat_id=chat_id)
     elif callback_query.data == "_forecast_weather_five_days":
         await callback_query.answer(text="Нажаль ця функці знаходиться у стадії розробки...")
