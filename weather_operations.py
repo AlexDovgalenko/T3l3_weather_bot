@@ -8,8 +8,7 @@ from weather_cache.weather_cache_utils import check_weather_cache, update_weathe
 from weather_providers.weather_meteomatics import MeteomaticsStrategy
 from weather_providers.weather_openweathermap import OpenWeatherMapStrategy
 from weather_providers.weather_provider_exception import FailedFetchWeatherDataFromProvider
-from weather_providers.weather_provider_strategy import ForecastPeriod, WeatherData, \
-    WeatherProviderName
+from weather_providers.weather_provider_strategy import ForecastPeriod, WeatherData, WeatherProviderName
 
 logger = logging.getLogger()
 
