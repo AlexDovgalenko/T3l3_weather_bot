@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.types import InlineKeyboardButton
 
+from general_symbols import SpecialSymbols
 from keyboards.common_emoji_codes import ua_flag_emoji, us_flag_emoji, crossed_flags_emoji
 from weather_providers.weather_provider_strategy import WeatherProviderName
 
@@ -17,8 +18,9 @@ def reply_languages_keyboard():
 
 def reply_weather_provider_keyboard():
     weather_providers_buttons_text = [wp.value for wp in WeatherProviderName]
-    weather_providers_buttons = [InlineKeyboardButton(text=text, callback_data=text) for text in
-                                 weather_providers_buttons_text]
+    weather_providers_buttons = [InlineKeyboardButton(
+        text=f"{SpecialSymbols.ARROW_UP.value} text {SpecialSymbols.ARROW_UP.value}", callback_data=text) for text in
+        weather_providers_buttons_text]
     keyboard = types.InlineKeyboardMarkup(resize_keyboard=True, row_width=1)
     keyboard.add(*weather_providers_buttons)
     return keyboard
