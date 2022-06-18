@@ -55,9 +55,9 @@ general_handlers.register_general_handlers(dp)
 #     update.message.bot.send_message(text='Select a language', reply_markup=reply_markup, chat_id=chat_id)
 
 
-def bot_main_test():
+def launch_bot():
     executor.start_polling(dispatcher=dp, skip_updates=True, on_startup=on_startup)
 
 
 if __name__ == '__main__':
-    bot_main_test()
+    launch_bot()
