@@ -93,10 +93,10 @@ def check_weather_cache(city_name: str, weather_provider_name: str, timestamp: i
      Returns """
     try:
         lat, lon = get_lat_lon_from_city_name(city_name)
-    except (GeneralGeocodingError, UnableToLocateCoordinates):
+    except (GeneralGeocodingError, UnableToLocateCoordinates) as exception:
         err = f"Unable to obtain Latutude and Lontitude for provided city '{city_name}'."
         logger.error(err)
-        raise FailedToCheckWeatherCache(err)
+        raise exception
     lat_lon = "-".join([lat, lon])
     try:
         result = get_weather_item_from_db(lat_lon=lat_lon, weather_provider_name=weather_provider_name, period=period)

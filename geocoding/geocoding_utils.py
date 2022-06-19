@@ -31,4 +31,5 @@ def get_lat_lon_from_city_name(city_name: str) -> Optional[Tuple[str, str]]:
 
 
 if __name__ == "__main__":
-    print(get_lat_lon_from_city_name(city_name="london"))
+    # print(get_lat_lon_from_city_name(city_name="dispatcher.register_errors_handler(global_error_handler)"))
+    print(get_lat_lon_from_city_name(city_name="dispatcher.register_errors_handler(global_error_handler)"))

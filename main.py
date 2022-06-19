@@ -3,7 +3,7 @@ import logging
 from aiogram import executor
 
 from bot_init import dp
-from handlers import user_options_handlers, commands_handlers, general_handlers
+from handlers import user_options_handlers, commands_handlers, general_handlers, error_handlers
 
 test_data = []
 
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 async def on_startup(_):
     logger.info("Bot went Online!!!")
 
-
+error_handlers.register_error_handlers(dp)
 commands_handlers.register_commands_handlers(dp)
 user_options_handlers.register_user_options_handlers(dp)
 general_handlers.register_general_handlers(dp)
