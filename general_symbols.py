@@ -6,6 +6,7 @@ class GeneralEmojies(Enum):
     CHECK_MARK = "\U00002705"
     GLOWING_STAR = "\U0001F31F"
     HOUSE = "\U0001F3E1"
+    WARNING = "\U000026A0"
 
 
 class SpecialSymbols(Enum):
