@@ -70,3 +70,4 @@ def register_general_handlers(dispatcher: "Dispatcher"):
     dispatcher.register_callback_query_handler(weather_choice_handler, Text(startswith="_forecast_weather_"),
                                                state=FSMWeatherConditions.forecast_type)
     dispatcher.register_message_handler(general_text_handler, state=None)
+

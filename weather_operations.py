@@ -97,5 +97,5 @@ def compile_current_weather_output(weather_provider_name: str, lat_lon: str, cit
     return text
 
 
-def compile_5d_forecast_weather_output(weather_provider_name: str, lat_lon: str, city_name: str) -> str:
+def compile_5d_forecast_weather_output(lat_lon: str, weather_provider_name: str, city_name: str) -> str:
     raise NotImplementedError("This option is in development phase...")
