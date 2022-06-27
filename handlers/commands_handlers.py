@@ -1,10 +1,10 @@
 from aiogram import types
 
 from bot_init import get_all_user_ids
-from general_symbols import GeneralEmojies
+from general_symbols import GeneralEmojis
 from handlers.user_options_handlers import settings
 
-start_text = f"{GeneralEmojies.HOUSE.value}<b> Оберіть назву населеного пункту...</b>"
+start_text = f"{GeneralEmojis.HOUSE.value}<b> Оберіть назву населеного пункту...</b>"
 
 about_text = """➫ Цей бот дозволяє дізнатися <b>поточну погоду</b> в обраному населеному пункті або <b>прогноз у найближчі 5 днів</b> за бажанням.
 

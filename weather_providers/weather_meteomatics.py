@@ -8,7 +8,6 @@ from typing import Optional, Union
 import requests
 from dotenv import load_dotenv
 
-from geocoding.geocoding_utils import get_lat_lon_from_city_name
 from weather_providers.weather_provider_strategy import WeatherProviderStrategy, WeatherData, ForecastPeriod, \
     WeatherProviderName
 
@@ -41,7 +40,7 @@ class MeteomaticsStrategy(WeatherProviderStrategy):
             return None
         return response.json()
 
-    def fetch_weather_data(self, city_name: str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Union[
+    def fetch_weather_data(self, lat_lon: str, city_name:str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Union[
         WeatherData, str]:
         pass
 

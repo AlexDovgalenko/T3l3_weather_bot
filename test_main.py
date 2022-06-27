@@ -6,7 +6,6 @@ from dotenv import load_dotenv, find_dotenv
 from telegram import Update, ParseMode, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import CommandHandler, Updater, CallbackQueryHandler, CallbackContext, MessageHandler
 
-from weather_operations import compile_current_weather_output
 from weather_providers.weather_openweathermap import OpenWeatherMapStrategy
 
 load_dotenv(find_dotenv())
@@ -41,7 +40,6 @@ def user_options(update: Update, _: CallbackContext) -> None:
     chat_id = update.message.chat_id
     keyboard = [[KeyboardButton(text="Оберіть назву населеного пункту...")]]
     reply_markup = ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True, one_time_keyboard=True)
-
 
 
 def button(update: Update, context: CallbackContext) -> None:

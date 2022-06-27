@@ -2,7 +2,8 @@ import logging
 from datetime import datetime
 from typing import Tuple, Union
 
-from keyboards.common_emoji_codes import poop_emoji
+from general_symbols import GeneralEmojis
+from keyboards.general_keyboards import WeatherForecastType
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToUpdateWeatherCache
 from weather_cache.weather_cache_utils import check_weather_cache, update_weather_cache
 from weather_providers.weather_meteomatics import MeteomaticsStrategy
@@ -17,12 +18,14 @@ WEATHER_PROVIDER_STRATEGY_DICT = {WeatherProviderName.OPENWEATHERMAP.value: Open
 
 
 def return_current_weather_data(weather_provider_name: str, city_name: str,
-                                timestamp: int, period: ForecastPeriod) -> Tuple[Union[WeatherData, str], bool]:
+                                timestamp: int, period: ForecastPeriod, lat_lon: str) -> Tuple[
+    Union[WeatherData, str], bool]:
+    """Function checks if weather data for provided weather provider, forecast period and coordinates present in the DB."""
     try:
-        result, cached_data = check_weather_cache(city_name=city_name,
-                                                  period=period.CURRENT.value,
+        result, cached_data = check_weather_cache(period=period.CURRENT.value,
                                                   weather_provider_name=weather_provider_name,
-                                                  timestamp=timestamp)
+                                                  timestamp=timestamp,
+                                                  lat_lon=lat_lon)
         if result:
             return cached_data, False
     except FailedToCheckWeatherCache as err:
@@ -30,22 +33,47 @@ def return_current_weather_data(weather_provider_name: str, city_name: str,
         raise err
     weather_provider = WEATHER_PROVIDER_STRATEGY_DICT.get(weather_provider_name)
     try:
-        return weather_provider.fetch_weather_data(city_name=city_name), True
+        return weather_provider.fetch_weather_data(lat_lon=lat_lon, city_name=city_name), True
     except FailedFetchWeatherDataFromProvider:
         logger.error(f"Failed to fetch weather data for city: '{city_name}' and weather provider "
                      f"'{weather_provider_name}'")
 
 
-def compile_current_weather_output(weather_provider_name: str, city_name: str) -> str:
+def compile_weather_output(lat_lon: str, weather_provider_name: str, forecast_type: WeatherForecastType,
+                           city_name: str):
+    """Returns HTML pre-formatted weather output for requested location, weather provider and coordinates,
+    based on weather forecast type."""
+    if forecast_type == WeatherForecastType.CURRENT.value:
+        return compile_current_weather_output(weather_provider_name=weather_provider_name, lat_lon=lat_lon,
+                                              city_name=city_name)
+    elif forecast_type == WeatherForecastType.FIVE_DAYS.value:
+        return compile_5d_forecast_weather_output(weather_provider_name=weather_provider_name, lat_lon=lat_lon,
+                                                  city_name=city_name)
+    else:
+        raise RuntimeError(
+            f"Unable to compile weather output for the following options:\nWeather provider: {weather_provider_name}"
+            f"\nCity name: {city_name}\nLatitude and Longitude: {lat_lon}")
+
+
+def compile_current_weather_output(weather_provider_name: str, lat_lon: str, city_name: str) -> str:
+    """Returns current weather HTML pre-formatted weather output for requested location, weather provider and
+    coordinates.
+
+    Function queries weather data for provided weather provider, forecast period and coordinates present in the DB.
+    If data exist -- returns data,
+    if not -- updated DB with fresh data and returns it.
+    In case if it is failed to get weather data - returns text message with corresponding error.
+    """
     now = datetime.now()
     date_time_hrs = now.strftime("%Y-%m-%d %H:%M")
-    err_msg = f"{poop_emoji} Не вдалося отримати данні по населеному пункту **<b> {city_name} **</b>\n" \
-              f"Будьласка перевірте назву населеного пункту та повторіть спробу... {poop_emoji}"
+    err_msg = f"{GeneralEmojis.POOP.value} Не вдалося отримати данні по населеному пункту **<b> {city_name} **</b>\n" \
+              f"Будьласка перевірте назву населеного пункту та повторіть спробу... {GeneralEmojis.POOP.value}"
     text = f"{date_time_hrs}\n==========================\n<code>{err_msg}</code>"
     weather_data, needs_cache_update = return_current_weather_data(weather_provider_name=weather_provider_name,
                                                                    city_name=city_name,
                                                                    timestamp=int(now.timestamp()),
-                                                                   period=ForecastPeriod.CURRENT)
+                                                                   period=ForecastPeriod.CURRENT,
+                                                                   lat_lon=lat_lon)
 
     if isinstance(weather_data, tuple):
         text = weather_data[4]
@@ -68,3 +96,7 @@ def compile_current_weather_output(weather_provider_name: str, city_name: str) -
         except FailedToUpdateWeatherCache as err:
             logger.error(err)
     return text
+
+
+def compile_5d_forecast_weather_output(weather_provider_name: str, lat_lon: str, city_name: str) -> str:
+    raise NotImplementedError("This option is in development phase...")

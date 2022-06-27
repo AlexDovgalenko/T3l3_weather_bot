@@ -1,10 +1,7 @@
 import logging
 import sqlite3
-from typing import Optional
 
 from config import APP_DB_NAME, WEATHER_CACHE_TABLE_NAME
-from geocoding.geocoding_exceptions import GeneralGeocodingError, UnableToLocateCoordinates
-from geocoding.geocoding_utils import get_lat_lon_from_city_name
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToGetWeatherDataFromDB, \
     FailedToInsertWeatherDataIntoDB, FailedToUpdateWeatherDataInDB, FailedToUpdateWeatherCache
 
@@ -47,22 +44,20 @@ weather_db = WeatherCacheDB(APP_DB_NAME)
 
 
 def get_weather_item_from_db(lat_lon: str, weather_provider_name: str, period: str):
-    logger.info(f"Tryint to get weather data with lat-lon: '{lat_lon}', period: {period} and weather "
+    logger.info(f"Tryint to get weather data with lat-lon: '{lat_lon}', period: '{period}' and weather "
                 f"provider: '{weather_provider_name}'...")
     try:
         sql_query = f"""SELECT * from {WEATHER_CACHE_TABLE_NAME} WHERE LAT_LON = '{lat_lon}' AND WEATHER_PROVIDER = '{weather_provider_name}' AND PERIOD = '{period}'"""
         weather_db.db_cursor.execute(sql_query)
         result = weather_db.db_cursor.fetchone()
     except Exception as err:
-        logger.error(err)
+        logger.error(f"Failed to get weather data from the DB.\n {err}")
         raise FailedToGetWeatherDataFromDB("Failed to get weather data from the DB.")
     return result
 
 
 def insert_weather_item_into_db(weather_provider_name: str, timestamp: int, period: str, weather_data: str,
-                                lat_lon: Optional[str], city_name: Optional[str] = None):
-    if not lat_lon:
-        lat_lon = "-".join(get_lat_lon_from_city_name(city_name))
+                                lat_lon: str):
     logger.info(f"Inserting weather data with lat-lon: '{lat_lon}', period: {period} and weather "
                 f"provider: '{weather_provider_name}'...")
     try:
@@ -87,17 +82,10 @@ def update_weather_item_in_db(weather_provider_name: str, timestamp: int, period
         raise FailedToUpdateWeatherDataInDB("Failed to update weather data in the DB.")
 
 
-def check_weather_cache(city_name: str, weather_provider_name: str, timestamp: int, period: str):
-    """Function checks if combination of city location + weather provider record already exists in DB, and it is more
-     than one hour old.
+def check_weather_cache(weather_provider_name: str, timestamp: int, period: str, lat_lon: str):
+    """Function checks if combination of location latitude and longitude + weather provider record already exists in DB,
+    and it is more than one hour old.
      Returns """
-    try:
-        lat, lon = get_lat_lon_from_city_name(city_name)
-    except (GeneralGeocodingError, UnableToLocateCoordinates) as exception:
-        err = f"Unable to obtain Latutude and Lontitude for provided city '{city_name}'."
-        logger.error(err)
-        raise exception
-    lat_lon = "-".join([lat, lon])
     try:
         result = get_weather_item_from_db(lat_lon=lat_lon, weather_provider_name=weather_provider_name, period=period)
     except FailedToCheckWeatherCache:
@@ -121,8 +109,8 @@ def update_weather_cache(lat_lon: str, period: str, weather_provider_name: str, 
                 update_weather_item_in_db(weather_provider_name=weather_provider_name, timestamp=timestamp,
                                           weather_data=current_weather_data, lat_lon=lat_lon, period=period)
         else:
-            insert_weather_item_into_db(weather_provider_name=weather_provider_name, timestamp=timestamp,
-                                        weather_data=current_weather_data, lat_lon=lat_lon, period=period)
+            insert_weather_item_into_db(weather_provider_name=weather_provider_name, timestamp=timestamp, period=period,
+                                        weather_data=current_weather_data, lat_lon=lat_lon)
     except FailedToCheckWeatherCache as err:
         logger.error(err)
         raise FailedToUpdateWeatherCache("Failed to update weather cache data in the DB.")
@@ -135,11 +123,7 @@ def check_time_frame(db_timestamp: int, current_timestamp: int):
 
 if __name__ == '__main__':
     # get_weather_item_from_db()
-    # insert_weather_item_into_db(city_name="Odesa",  weather_provider_name="Sinoptik", timestamp=1652527560, weather_data="Some Weather data237328")
+
     update_weather_item_in_db(lat_lon="46.472500000000025-30.73711000000003", weather_provider_name="Sinoptik",
                               timestamp=1652527777,
                               weather_data="Some Weather data 4444")
-    # timestamp = int(datetime.now().timestamp())
-    # print(get_weather_item_from_db('46.472500000000026-30.73711000000003', "Sinoptik"))
-    # print(datetime.fromtimestamp(1652527516.639966))
-    # print(datetime.from-timestamp(timestamp))
