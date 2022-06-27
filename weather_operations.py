@@ -3,13 +3,12 @@ from datetime import datetime
 from typing import Tuple, Union
 
 from general_symbols import GeneralEmojis
-from keyboards.general_keyboards import WeatherForecastType
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToUpdateWeatherCache
 from weather_cache.weather_cache_utils import check_weather_cache, update_weather_cache
 from weather_providers.weather_meteomatics import MeteomaticsStrategy
 from weather_providers.weather_openweathermap import OpenWeatherMapStrategy
 from weather_providers.weather_provider_exception import FailedFetchWeatherDataFromProvider
-from weather_providers.weather_provider_strategy import ForecastPeriod, WeatherData, WeatherProviderName
+from weather_providers.weather_provider_strategy import WeatherData, WeatherProviderName, WeatherForecastType
 
 logger = logging.getLogger()
 
@@ -18,11 +17,11 @@ WEATHER_PROVIDER_STRATEGY_DICT = {WeatherProviderName.OPENWEATHERMAP.value: Open
 
 
 def return_current_weather_data(weather_provider_name: str, city_name: str,
-                                timestamp: int, period: ForecastPeriod, lat_lon: str) -> Tuple[
+                                timestamp: int, period: WeatherForecastType, lat_lon: str) -> Tuple[
     Union[WeatherData, str], bool]:
     """Function checks if weather data for provided weather provider, forecast period and coordinates present in the DB."""
     try:
-        result, cached_data = check_weather_cache(period=period.CURRENT.value,
+        result, cached_data = check_weather_cache(period=period.CURRENT,
                                                   weather_provider_name=weather_provider_name,
                                                   timestamp=timestamp,
                                                   lat_lon=lat_lon)
@@ -72,7 +71,7 @@ def compile_current_weather_output(weather_provider_name: str, lat_lon: str, cit
     weather_data, needs_cache_update = return_current_weather_data(weather_provider_name=weather_provider_name,
                                                                    city_name=city_name,
                                                                    timestamp=int(now.timestamp()),
-                                                                   period=ForecastPeriod.CURRENT,
+                                                                   period=WeatherForecastType.CURRENT,
                                                                    lat_lon=lat_lon)
 
     if isinstance(weather_data, tuple):
@@ -90,7 +89,7 @@ def compile_current_weather_output(weather_provider_name: str, lat_lon: str, cit
 
         try:
             update_weather_cache(lat_lon=weather_data.lat_lon, current_weather_data=text,
-                                 period=ForecastPeriod.CURRENT.value,
+                                 period=WeatherForecastType.CURRENT,
                                  weather_provider_name=weather_provider_name,
                                  timestamp=int(weather_data.timestamp))
         except FailedToUpdateWeatherCache as err:
@@ -98,5 +97,5 @@ def compile_current_weather_output(weather_provider_name: str, lat_lon: str, cit
     return text
 
 
-def compile_5d_forecast_weather_output(weather_provider_name: str, lat_lon: str, city_name: str) -> str:
+def compile_5d_forecast_weather_output(lat_lon: str, weather_provider_name: str, city_name: str) -> str:
     raise NotImplementedError("This option is in development phase...")
