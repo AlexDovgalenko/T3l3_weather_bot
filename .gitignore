@@ -3,5 +3,6 @@ weather_cache/weather_cache.db
 app_db.db
 text_garbage
 test.py
+playground
 .idea
 *__pycache__*

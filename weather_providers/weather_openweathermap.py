@@ -8,7 +8,7 @@ from typing import Optional, List, Tuple
 import requests
 from dotenv import load_dotenv
 
-from geocoding.geocoding_utils import get_lat_lon_from_city_name
+from geocoding.geocoding_utils import get_lat_lon_from_attribute
 from utils import hpa_to_mm_hg_converter, math_round
 from weather_emoji import get_weather_emojy
 from weather_providers.weather_provider_strategy import WeatherData, WeatherProviderStrategy, ForecastPeriod, \
@@ -35,17 +35,13 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
     provider_name = WeatherProviderName.OPENWEATHERMAP.value
     base_url = "api.openweathermap.org"
 
-    def _get_weather_response(self, city_name: str) -> Optional[Tuple[dict, str]]:
+    def _get_weather_response(self, lat_lon: str) -> Optional[Tuple[dict, str]]:
         """ Method gets weather response from api.openweathermap.org
 
-        :param city_name: Name of the city to find out weather
+        :param lat_lon: latitude and longitude for chosen geolocation
         :return:
         """
-        latitude, longitude = get_lat_lon_from_city_name(city_name)
-
-        if not (latitude or longitude):
-            logger.error(f"Unable to get latitude and longitude tor given city name: {city_name}")
-            return None
+        latitude, longitude = get_lat_lon_from_attribute(lat_lon)
         try:
             response = requests.get(
                 # f"https://api.openweathermap.org/data/2.5/{period_option.value}?lat={latitude}&lon={longitude}&appid={OPEN_WEATHER_API_KEY}&lang={LANGUAGE}&units={UNITS}&mode=json").json()
@@ -58,12 +54,11 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
             return None
         return json.loads(response.text), "-".join([latitude, longitude])
 
-    def fetch_weather_data(self, city_name: str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Optional[
+    def fetch_weather_data(self, lat_lon: str, city_name: str,
+                           period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Optional[
         WeatherData]:
 
-        response = self._get_weather_response(city_name)
-        # err_msg = f"\U0001F4A9 Не вдалося отримати данні по населеному пункту **<b> {city_name} **</b>\n" \
-        #           f"Будьласка перевірте назву населеного пункту та повторіть спробу... \U0001F4A9"
+        response = self._get_weather_response(lat_lon=lat_lon)
 
         if not response:
             return None
