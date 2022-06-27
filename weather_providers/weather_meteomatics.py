@@ -8,7 +8,7 @@ from typing import Optional, Union
 import requests
 from dotenv import load_dotenv
 
-from weather_providers.weather_provider_strategy import WeatherProviderStrategy, WeatherData, ForecastPeriod, \
+from weather_providers.weather_provider_strategy import WeatherProviderStrategy, WeatherData, WeatherForecastType, \
     WeatherProviderName
 
 load_dotenv()
@@ -40,7 +40,7 @@ class MeteomaticsStrategy(WeatherProviderStrategy):
             return None
         return response.json()
 
-    def fetch_weather_data(self, lat_lon: str, city_name:str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Union[
+    def fetch_weather_data(self, lat_lon: str, city_name:str, period_option: WeatherForecastType = WeatherForecastType.CURRENT) -> Union[
         WeatherData, str]:
         pass
 
