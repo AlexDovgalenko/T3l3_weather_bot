@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -12,11 +12,17 @@ from weather_operations import compile_weather_output
 
 if TYPE_CHECKING:
     from aiogram import Dispatcher
+    from geocoding.geocoding_utils import LocationPoint
 
 
 class FSMWeatherConditions(StatesGroup):
     lat_lon = State()
     forecast_type = State()
+
+
+def get_location_address_by_lat_lon(location_point_list: List["LocationPoint"], lat_lon: str) -> str:
+    """Returns Location address based on available list of LocationPoint objects."""
+    return [item.address for item in location_point_list if item.lat_lon == lat_lon][0]
 
 
 async def general_text_handler(message: types.Message, state=None):
@@ -27,6 +33,8 @@ async def general_text_handler(message: types.Message, state=None):
     if len(available_location_options) > 1:
         keyboard = city_specification_items_keyboard(available_location_options)
         await FSMWeatherConditions.lat_lon.set()
+        async with state.proxy() as data:
+            data['location_storage'] = available_location_options
         await message.reply(text=message_text, reply_markup=keyboard, allow_sending_without_reply=True)
 
     else:
@@ -41,7 +49,9 @@ async def location_choice_handler(callback_query: types.CallbackQuery, state=FSM
     """Handles user choice of location on FSMWeatherConditions.lat_lon state."""
     # chat_id = callback_query.message.chat.id
     async with state.proxy() as data:
-        data['lat_lon'] = callback_query.data
+        data["lat_lon"] = callback_query.data
+        data["address"] = get_location_address_by_lat_lon(location_point_list=data['location_storage'],
+                                                          lat_lon=data["lat_lon"])
     keyboard = weather_forecast_type_keyboard()
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)
     await FSMWeatherConditions.next()
@@ -55,7 +65,7 @@ async def weather_choice_handler(callback_query: types.CallbackQuery, state=FSMC
         data['forecast_type'] = callback_query.data
     weather_options = data._data
     await state.finish()
-    weather_text = compile_weather_output(city_name=callback_query.message.text,
+    weather_text = compile_weather_output(city_name=weather_options.get("address"),
                                           weather_provider_name=user_data[2],
                                           lat_lon=weather_options.get("lat_lon"),
                                           forecast_type=weather_options.get("forecast_type"))
@@ -70,4 +80,3 @@ def register_general_handlers(dispatcher: "Dispatcher"):
     dispatcher.register_callback_query_handler(weather_choice_handler, Text(startswith="_forecast_weather_"),
                                                state=FSMWeatherConditions.forecast_type)
     dispatcher.register_message_handler(general_text_handler, state=None)
-
