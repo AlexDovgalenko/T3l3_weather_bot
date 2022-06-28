@@ -5,13 +5,6 @@ from config import APP_DB_NAME, WEATHER_CACHE_TABLE_NAME
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToGetWeatherDataFromDB, \
     FailedToInsertWeatherDataIntoDB, FailedToUpdateWeatherDataInDB, FailedToUpdateWeatherCache
 
-# load_dotenv(find_dotenv())
-
-# APP_DB_NAME = os.environ.get("APP_DB_NAME")
-# WEATHER_CACHE_TABLE_NAME = os.environ.get("WEATHER_CACHE_TABLE_NAME")
-
-# APP_DB_NAME = "weather_cache/weather_cache.db"
-# WEATHER_CACHE_TABLE_NAME = "weather_cache"
 from weather_providers.weather_provider_strategy import WeatherForecastType
 
 logger = logging.getLogger()
