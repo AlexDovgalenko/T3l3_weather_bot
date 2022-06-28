@@ -5,10 +5,6 @@ from aiogram import executor
 from bot_init import dp
 from handlers import user_options_handlers, commands_handlers, general_handlers, error_handlers
 
-test_data = []
-
-options_dict = {}
-
 logging.basicConfig(
     format='%(asctime)s - [%(name)s] [%(levelname)s] - %(message)s',
     level=logging.INFO

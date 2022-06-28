@@ -1,9 +1,5 @@
 import logging
 
-import telegram.ext.filters
-from telegram import Update, ParseMode, KeyboardButton, ReplyKeyboardMarkup
-from telegram.ext import CommandHandler, Updater, CallbackQueryHandler, CallbackContext, MessageHandler
-
 from config import BOT_HASH
 from weather_providers.weather_openweathermap import OpenWeatherMapStrategy
 
