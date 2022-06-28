@@ -10,10 +10,9 @@ class WeatherProviderName(Enum):
     SINOPTIC = "Sinoptik"
 
 
-class ForecastPeriod(Enum):
-    """Class stores period option for query weather"""
-    CURRENT: str = "current"
-    FORECAST: str = "forecast"
+class WeatherForecastType(Enum):
+    CURRENT = "_forecast_weather_current"
+    FIVE_DAYS = "_forecast_weather_five_days"
 
 
 @dataclass
@@ -50,7 +49,7 @@ class WeatherProviderStrategy(ABC):
 
     @abstractmethod
     def fetch_weather_data(self, lat_lon: str, city_name: str,
-                           period_option: "ForecastPeriod" = ForecastPeriod.CURRENT) -> \
+                           period_option: "WeatherForecastType" = WeatherForecastType.CURRENT) -> \
             Union["WeatherData", str]:
         pass
 

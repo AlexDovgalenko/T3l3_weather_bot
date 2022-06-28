@@ -4,6 +4,12 @@ from general_symbols import GeneralEmojis
 from geocoding.geocoding_exceptions import GeneralGeocodingError
 
 
+# async def not_implemented_error_handler(update: types.Update, exception=NotImplementedError):
+#     """Handles NotImplementedError exception and throws pop-up message."""
+#     await update.callback_query.answer(text="Нажаль ця функці знаходиться у стадії розробки...")
+#     await update.callback_query.answer()
+
+
 async def geocoding_error_handler(update: types.Update, exception=GeneralGeocodingError):
     """Handling geocoding type of exceptions within bot app
 
@@ -33,4 +39,5 @@ async def global_error_handler(update: types.Update, exception):
 def register_error_handlers(dispatcher: "Dispatcher"):
     dispatcher.errors_handlers.once = True
     dispatcher.register_errors_handler(geocoding_error_handler)
+    # dispatcher.register_errors_handler(not_implemented_error_handler)
     dispatcher.register_errors_handler(global_error_handler)

@@ -21,10 +21,6 @@ class FSMWeatherConditions(StatesGroup):
 
 async def general_text_handler(message: types.Message, state=None):
     """Handles all messages from user."""
-    # keyboard = weather_forecast_type_keyboard()
-    # message_text = message.text
-    # await message.delete()
-    # await message.reply(text=message_text, reply_markup=keyboard, allow_sending_without_reply=True)
     message_text = message.text
     await message.delete()
     available_location_options = get_available_location_options(message_text)
@@ -74,3 +70,4 @@ def register_general_handlers(dispatcher: "Dispatcher"):
     dispatcher.register_callback_query_handler(weather_choice_handler, Text(startswith="_forecast_weather_"),
                                                state=FSMWeatherConditions.forecast_type)
     dispatcher.register_message_handler(general_text_handler, state=None)
+

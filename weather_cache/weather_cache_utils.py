@@ -5,6 +5,15 @@ from config import APP_DB_NAME, WEATHER_CACHE_TABLE_NAME
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToGetWeatherDataFromDB, \
     FailedToInsertWeatherDataIntoDB, FailedToUpdateWeatherDataInDB, FailedToUpdateWeatherCache
 
+# load_dotenv(find_dotenv())
+
+# APP_DB_NAME = os.environ.get("APP_DB_NAME")
+# WEATHER_CACHE_TABLE_NAME = os.environ.get("WEATHER_CACHE_TABLE_NAME")
+
+# APP_DB_NAME = "weather_cache/weather_cache.db"
+# WEATHER_CACHE_TABLE_NAME = "weather_cache"
+from weather_providers.weather_provider_strategy import WeatherForecastType
+
 logger = logging.getLogger()
 
 
@@ -35,11 +44,11 @@ class WeatherCacheDB:
 weather_db = WeatherCacheDB(APP_DB_NAME)
 
 
-def get_weather_item_from_db(lat_lon: str, weather_provider_name: str, period: str):
-    logger.info(f"Tryint to get weather data with lat-lon: '{lat_lon}', period: '{period}' and weather "
+def get_weather_item_from_db(lat_lon: str, weather_provider_name: str, period: WeatherForecastType):
+    logger.info(f"Tryint to get weather data with lat-lon: '{lat_lon}', period: '{period.value}' and weather "
                 f"provider: '{weather_provider_name}'...")
     try:
-        sql_query = f"""SELECT * from {WEATHER_CACHE_TABLE_NAME} WHERE LAT_LON = '{lat_lon}' AND WEATHER_PROVIDER = '{weather_provider_name}' AND PERIOD = '{period}'"""
+        sql_query = f"""SELECT * from {WEATHER_CACHE_TABLE_NAME} WHERE LAT_LON = '{lat_lon}' AND WEATHER_PROVIDER = '{weather_provider_name}' AND PERIOD = '{period.value}'"""
         weather_db.db_cursor.execute(sql_query)
         result = weather_db.db_cursor.fetchone()
     except Exception as err:
@@ -48,25 +57,25 @@ def get_weather_item_from_db(lat_lon: str, weather_provider_name: str, period: s
     return result
 
 
-def insert_weather_item_into_db(weather_provider_name: str, timestamp: int, period: str, weather_data: str,
+def insert_weather_item_into_db(weather_provider_name: str, timestamp: int, period: WeatherForecastType, weather_data: str,
                                 lat_lon: str):
-    logger.info(f"Inserting weather data with lat-lon: '{lat_lon}', period: {period} and weather "
+    logger.info(f"Inserting weather data with lat-lon: '{lat_lon}', period: {period.value} and weather "
                 f"provider: '{weather_provider_name}'...")
     try:
         sql_query = f"""INSERT into {WEATHER_CACHE_TABLE_NAME} values (?, ?, ?, ?, ?) """
-        weather_db.db_cursor.execute(sql_query, (lat_lon, weather_provider_name, period, timestamp, weather_data))
+        weather_db.db_cursor.execute(sql_query, (lat_lon, weather_provider_name, period.value, timestamp, weather_data))
         weather_db.db_connection.commit()
     except Exception as err:
         logger.error(err)
         raise FailedToInsertWeatherDataIntoDB("Failed to insert weather data into the DB.")
 
 
-def update_weather_item_in_db(weather_provider_name: str, timestamp: int, period: str, weather_data: str, lat_lon: str):
-    logger.info(f"Updating weather data with lat-lon: '{lat_lon}', period: '{period}' and weather "
+def update_weather_item_in_db(weather_provider_name: str, timestamp: int, period: WeatherForecastType, weather_data: str, lat_lon: str):
+    logger.info(f"Updating weather data with lat-lon: '{lat_lon}', period: '{period.value}' and weather "
                 f"provider: '{weather_provider_name}'...")
     try:
         sql_query = f""" UPDATE {WEATHER_CACHE_TABLE_NAME} SET TIMESTAMP = {timestamp}, WEATHER_DATA = '{weather_data}' 
-        WHERE LAT_LON = '{lat_lon}' AND  WEATHER_PROVIDER = '{weather_provider_name}' AND PERIOD = '{period}'"""
+        WHERE LAT_LON = '{lat_lon}' AND  WEATHER_PROVIDER = '{weather_provider_name}' AND PERIOD = '{period.value}'"""
         weather_db.db_cursor.execute(sql_query)
         weather_db.db_connection.commit()
     except Exception as err:
@@ -74,7 +83,7 @@ def update_weather_item_in_db(weather_provider_name: str, timestamp: int, period
         raise FailedToUpdateWeatherDataInDB("Failed to update weather data in the DB.")
 
 
-def check_weather_cache(weather_provider_name: str, timestamp: int, period: str, lat_lon: str):
+def check_weather_cache(weather_provider_name: str, timestamp: int, period: WeatherForecastType, lat_lon: str):
     """Function checks if combination of location latitude and longitude + weather provider record already exists in DB,
     and it is more than one hour old.
      Returns """
@@ -92,7 +101,7 @@ def check_weather_cache(weather_provider_name: str, timestamp: int, period: str,
     return is_cache_actual, result
 
 
-def update_weather_cache(lat_lon: str, period: str, weather_provider_name: str, timestamp: int,
+def update_weather_cache(lat_lon: str, period: WeatherForecastType, weather_provider_name: str, timestamp: int,
                          current_weather_data: str):
     try:
         result = get_weather_item_from_db(lat_lon=lat_lon, weather_provider_name=weather_provider_name, period=period)

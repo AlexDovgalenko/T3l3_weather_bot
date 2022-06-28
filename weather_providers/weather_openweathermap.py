@@ -10,7 +10,7 @@ from config import OPEN_WEATHER_API_KEY
 from geocoding.geocoding_utils import get_lat_lon_from_attribute
 from utils import hpa_to_mm_hg_converter, math_round
 from weather_emoji import get_weather_emojy
-from weather_providers.weather_provider_strategy import WeatherData, WeatherProviderStrategy, ForecastPeriod, \
+from weather_providers.weather_provider_strategy import WeatherData, WeatherProviderStrategy, WeatherForecastType, \
     WeatherProviderName
 from wind_direction_emoji import get_wind_direction_emoji
 
@@ -49,7 +49,7 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
         return json.loads(response.text), "-".join([latitude, longitude])
 
     def fetch_weather_data(self, lat_lon: str, city_name: str,
-                           period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Optional[
+                           period_option: WeatherForecastType = WeatherForecastType.CURRENT) -> Optional[
         WeatherData]:
 
         response = self._get_weather_response(lat_lon=lat_lon)
@@ -57,12 +57,12 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
         if not response:
             return None
         else:
-            if period_option is ForecastPeriod.CURRENT:
+            if period_option is WeatherForecastType.CURRENT:
                 weather_data = self._parse_current_weather(city_name, weather_response=response)
-            elif ForecastPeriod.FORECAST:
+            elif WeatherForecastType.FIVE_DAYS:
                 weather_data = self._parse_weather_forecast(city_name, weather_response=response)
             else:
-                logger.error(f"Incorrect 'period_option' waw passed, possible options are:{list(ForecastPeriod)}")
+                logger.error(f"Incorrect 'period_option' waw passed, possible options are:{list(WeatherForecastType)}")
                 return None
         if not weather_data:
             return None
