@@ -78,7 +78,8 @@ def compile_current_weather_output(weather_provider_name: str, lat_lon: str, cit
         text = weather_data[4]
 
     elif isinstance(weather_data, WeatherData):
-        text = f"<b>** {weather_data.city_name} **</b> : \t<b>{date_time_hrs}</b>\n" \
+        text = f"<b>** {weather_data.city_name} **</b> \n" \
+               f"<b>Поточна погода на:</b> \t{date_time_hrs}\n" \
                f"==========================\n" \
                f"<b>Погода</b>:\t{weather_data.weather_emoji}\t{weather_data.weather_summary}\n" \
                f"<b>Температура повітря</b>:\t{weather_data.temperature} С°\n" \
