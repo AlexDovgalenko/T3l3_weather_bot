@@ -2,4 +2,4 @@
 
 
 class FailedFetchWeatherDataFromProvider(Exception):
-    """General exception raised from Weather Providers module if it failed to wetch weather data."""
+    """General exception raised from Weather Providers module if it failed to fetch weather data."""

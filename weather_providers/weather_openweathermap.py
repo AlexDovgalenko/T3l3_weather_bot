@@ -1,24 +1,18 @@
 import json
 import logging
-import os
 from datetime import datetime
 from enum import Enum
 from typing import Optional, List, Tuple
 
 import requests
-from dotenv import load_dotenv
 
+from config import OPEN_WEATHER_API_KEY
 from geocoding.geocoding_utils import get_lat_lon_from_attribute
 from utils import hpa_to_mm_hg_converter, math_round
 from weather_emoji import get_weather_emojy
 from weather_providers.weather_provider_strategy import WeatherData, WeatherProviderStrategy, WeatherForecastType, \
     WeatherProviderName
 from wind_direction_emoji import get_wind_direction_emoji
-
-load_dotenv()
-
-OPEN_WEATHER_API_KEY = os.environ.get("OPEN_WEATHER_API_KEY")
-COUNTRY_NAME = os.environ.get("COUNTRY_NAME")
 
 UNITS = "metric"
 LANGUAGE = "US"
