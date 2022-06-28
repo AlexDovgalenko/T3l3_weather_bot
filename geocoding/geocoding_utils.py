@@ -32,7 +32,8 @@ def get_available_location_options(city_name: str) -> List[LocationPoint]:
                   f"is empty."
         logger.error(err_msg)
         raise UnableToLocateCoordinates(err_msg)
-    return __parse_raw_geo_output(filtered_result)
+    no_duplicates_list = __filter_location_duplicates(filtered_result)
+    return __parse_raw_geo_output(no_duplicates_list)
 
 
 def get_lat_lon_from_attribute(lat_lon: str) -> Optional[Tuple[str, str]]:
@@ -60,6 +61,11 @@ def __filter_geo_locations(geo_list) -> List[dict]:
         filter(lambda location: location["properties"]["quality"] == "Locality", geo_list.geojson.get("features")))
 
 
+def __drop_locations_duplicates(locations_list):
+    """Drops location duplicates if lat_lon in the list equals."""
+    pass
+
+
 def __parse_raw_geo_output(raw_geo_list) -> List[LocationPoint]:
     """Method parses raw list of geo-locations items into list of LocationPoint elements"""
     location_points_list = []
@@ -75,10 +81,27 @@ def __parse_raw_geo_output(raw_geo_list) -> List[LocationPoint]:
     return location_points_list
 
 
-# def specify_exact_location_from_list(locations_list):
+def __get_locations_geometry(geo_list: List[dict]) -> List[list]:
+    """Method to filters out list of available geolocations"""
+    if not geo_list:
+        return []
+    return [item["geometry"] for item in geo_list]
+
+
+def __filter_location_duplicates(geo_list: List[dict]) -> List[dict]:
+    """Filter out location duplicates by same geo coordinates.
+
+    :param geo_list: raw list of available geolocations
+    :return: filtered list of geolocations without duplicates
+    """
+    result_list = []
+    for location in range(len(geo_list)):
+        if geo_list[location].get("geometry") not in __get_locations_geometry(result_list):
+            result_list.append(geo_list[location])
+    return result_list
 
 
 if __name__ == "__main__":
-    # result = geocoder.arcgis(location='Черновцы', maxRows=10)
-    result = get_available_location_options(city_name='дерибасовская')
+    # result = geocoder.arcgis(location='Черноморское', maxRows=10)
+    result = get_available_location_options(city_name='Черноморское')
     print(result)
