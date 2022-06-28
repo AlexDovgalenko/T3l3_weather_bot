@@ -4,11 +4,8 @@ from dataclasses import dataclass
 from typing import Tuple, Optional, List
 
 import geocoder
-from dotenv import load_dotenv
 
 from geocoding.geocoding_exceptions import GeneralGeocodingError, UnableToLocateCoordinates, GeocodingDataParseError
-
-load_dotenv()
 
 logger = logging.getLogger()
 
@@ -82,7 +79,6 @@ def __parse_raw_geo_output(raw_geo_list) -> List[LocationPoint]:
 
 
 if __name__ == "__main__":
-
     # result = geocoder.arcgis(location='Черновцы', maxRows=10)
     result = get_available_location_options(city_name='дерибасовская')
     print(result)

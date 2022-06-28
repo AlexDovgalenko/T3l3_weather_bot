@@ -2,8 +2,6 @@ import logging
 
 from aiogram import executor
 
-# from telegram import Update, ParseMode, KeyboardButton, ReplyKeyboardMarkup
-# from telegram.ext import CommandHandler, Updater, CallbackQueryHandler, CallbackContext, MessageHandler
 from bot_init import dp
 from handlers import user_options_handlers, commands_handlers, general_handlers, error_handlers
 

@@ -1,22 +1,16 @@
 """Module contains data to work with meteomatics.com weather API resource."""
 
 import logging
-import os
 from datetime import datetime
 from typing import Optional, Union
 
 import requests
-from dotenv import load_dotenv
 
+from config import METEOMATICS_USERNAME, METEOMATICS_PASSWORD
 from weather_providers.weather_provider_strategy import WeatherProviderStrategy, WeatherData, ForecastPeriod, \
     WeatherProviderName
 
-load_dotenv()
-
 logger = logging.getLogger()
-
-METEOMATICS_USERNAME = os.environ.get("METEOMATICS_USERNAME")
-METEOMATICS_PASSWORD = os.environ.get("METEOMATICS_PASSWORD")
 
 parameters = "wind_speed_10m:ms,wind_dir_10m:d,t_2m:C,msl_pressure:hPa,weather_symbol_1h:idx,precip_24h:mm,t_max_2m_24h:C,t_min_2m_24h:C"
 
@@ -40,7 +34,8 @@ class MeteomaticsStrategy(WeatherProviderStrategy):
             return None
         return response.json()
 
-    def fetch_weather_data(self, lat_lon: str, city_name:str, period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Union[
+    def fetch_weather_data(self, lat_lon: str, city_name: str,
+                           period_option: ForecastPeriod = ForecastPeriod.CURRENT) -> Union[
         WeatherData, str]:
         pass
 

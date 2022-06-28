@@ -1,17 +1,13 @@
 import logging
-import os
 
 import telegram.ext.filters
-from dotenv import load_dotenv, find_dotenv
 from telegram import Update, ParseMode, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import CommandHandler, Updater, CallbackQueryHandler, CallbackContext, MessageHandler
 
+from config import BOT_HASH
 from weather_providers.weather_openweathermap import OpenWeatherMapStrategy
 
-load_dotenv(find_dotenv())
 logger = logging.getLogger()
-
-BOT_HASH = os.environ.get("BOT_HASH")
 
 WEATHER_PROVIDER = OpenWeatherMapStrategy()
 

@@ -1,16 +1,10 @@
 import logging
-import os
 import sqlite3
 
 from aiogram import Bot, types, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from dotenv import load_dotenv, find_dotenv
 
-from config import APP_DB_NAME, USER_OPTIONS_TABLE_NAME
-
-load_dotenv(find_dotenv())
-
-BOT_HASH = os.environ.get("BOT_HASH")
+from config import APP_DB_NAME, USER_OPTIONS_TABLE_NAME, BOT_HASH
 
 logger = logging.getLogger()
 storage = MemoryStorage()
