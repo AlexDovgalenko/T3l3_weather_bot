@@ -1,4 +1,5 @@
 from aiogram import types
+from loguru import logger
 
 from bot_init import get_all_user_ids
 from general_symbols import GeneralEmojis
@@ -16,21 +17,33 @@ about_text = """➫ Цей бот дозволяє дізнатися <b>пот�
 
 
 async def start(message: types.Message):
+    """'/start' command handler"""
+    logger.debug("Handling '/start' command...")
     chat_id = message.chat.id
+    logger.debug(f"Checking if user with id '{chat_id}' present in the DB...")
     if chat_id in get_all_user_ids():
         # move to forecast view
+        logger.debug("deleting command ...")
         await message.delete()
+        logger.debug("Sending message with 'start_text' to the chat.")
         await message.reply(text=start_text, allow_sending_without_reply=True)
     else:
         # proceed with user options configuration
+
         await settings(message=message)
 
 
 async def about(message: types.Message):
+    """ '/about' command handler"""
+    logger.debug("Handling '/about' command...")
+    logger.debug("deleting command ...")
     await message.delete()
+    logger.debug("Sending message with 'about_text' to the chat.")
     await message.reply(text=about_text, allow_sending_without_reply=True)
 
 
 def register_commands_handlers(dispatcher: "Dispatcher"):
+    """Function that registers all command handlers"""
+    logger.info("Registering command handlers...")
     dispatcher.register_message_handler(start, commands="start")
     dispatcher.register_message_handler(about, commands="about")

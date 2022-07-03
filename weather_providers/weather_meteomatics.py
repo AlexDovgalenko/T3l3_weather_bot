@@ -1,16 +1,14 @@
 """Module contains data to work with meteomatics.com weather API resource."""
 
-import logging
 from datetime import datetime
 from typing import Optional, Union
 
 import requests
+from loguru import logger
 
 from config import METEOMATICS_USERNAME, METEOMATICS_PASSWORD
 from weather_providers.weather_provider_strategy import WeatherProviderStrategy, WeatherData, WeatherProviderName, \
     WeatherForecastType
-
-logger = logging.getLogger()
 
 parameters = "wind_speed_10m:ms,wind_dir_10m:d,t_2m:C,msl_pressure:hPa,weather_symbol_1h:idx,precip_24h:mm,t_max_2m_24h:C,t_min_2m_24h:C"
 
