@@ -1,10 +1,10 @@
 import json
-import logging
 from datetime import datetime
 from enum import Enum
 from typing import Optional, List, Tuple
 
 import requests
+from loguru import logger
 
 from config import OPEN_WEATHER_API_KEY
 from geocoding.geocoding_utils import get_lat_lon_from_attribute
@@ -16,8 +16,6 @@ from wind_direction_emoji import get_wind_direction_emoji
 
 UNITS = "metric"
 LANGUAGE = "US"
-
-logger = logging.getLogger()
 
 
 class Language(Enum):

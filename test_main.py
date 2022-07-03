@@ -2,8 +2,8 @@ import logging
 
 from config import BOT_HASH
 from weather_providers.weather_openweathermap import OpenWeatherMapStrategy
-
-logger = logging.getLogger()
+from loguru import logger
+# logger = logging.getLogger()
 
 WEATHER_PROVIDER = OpenWeatherMapStrategy()
 

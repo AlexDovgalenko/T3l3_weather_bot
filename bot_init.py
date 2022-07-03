@@ -1,12 +1,11 @@
-import logging
 import sqlite3
 
 from aiogram import Bot, types, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from loguru import logger
 
 from config import APP_DB_NAME, USER_OPTIONS_TABLE_NAME, BOT_HASH
 
-logger = logging.getLogger()
 storage = MemoryStorage()
 
 bot = Bot(token=BOT_HASH, parse_mode=types.ParseMode.HTML)
@@ -50,7 +49,9 @@ def get_all_user_ids():
         logger.error(err)
         raise RuntimeError(f"Failed to fetch user IDs list from the '{USER_OPTIONS_TABLE_NAME}' table.")
     if result:
-        return [user_id[0] for user_id in result]
+        user_ids_list = [user_id[0] for user_id in result]
+        logger.debug(f"List of user ids in DB:\n{user_ids_list}")
+        return user_ids_list
     else:
         return result
 
@@ -83,7 +84,7 @@ def insert_user_data(user_id, user_data):
 
 
 def update_user_data(user_id, user_data):
-    logger.info(f"Trying to updating user options data with user ID: '{user_id}'...")
+    logger.info(f"Trying to update user options data with user ID: '{user_id}'...")
     try:
         sql_query = f""" UPDATE {USER_OPTIONS_TABLE_NAME} SET LANGUAGE = '{user_data.get("language")}', WEATHER_PROVIDER = '{user_data.get("weather_provider")}' WHERE  USER_ID = {user_id}"""
         app_db.db_cursor.execute(sql_query)
@@ -99,7 +100,7 @@ def delete_user_data(user_id):
 
 def write_user_data(user_id, user_data):
     """Updates user options in the DB if provided user_id is already present, or Inserts new record otherwise."""
-    logger.info("Trying to write user data into DB.")
+    logger.info("Trying to write user configuration data into DB.")
     if user_id in get_all_user_ids():
         update_user_data(user_id, user_data)
     else:

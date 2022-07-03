@@ -2,6 +2,8 @@ from enum import Enum
 from pprint import pprint
 from typing import Optional, Tuple
 
+from loguru import logger
+
 from weather_providers.weather_provider_strategy import WeatherProviderName
 
 WEATHER_EMOJI = {
@@ -39,12 +41,14 @@ class MetromaticsWeatherConditionsCodeRanges(Enum):
 
 
 def get_weather_emojy(weather_provider_name: "str", weather_code: int) -> Optional[Tuple[str]]:
+    logger.debug(f"Getting weather provider class basing on provided name '{weather_provider_name}'")
     if weather_provider_name == WeatherProviderName.OPENWEATHERMAP.value:
         emoji_class = OpenweathermapWeatherConditionsCodeRanges
     elif weather_provider_name == WeatherProviderName.METEOMATICS.value:
         emoji_class = MetromaticsWeatherConditionsCodeRanges
     else:
         return None
+    logger.debug(f"Getting weather provider emoji basing on provided name '{weather_code}'")
     for item in list(emoji_class):
         if weather_code in item.value[0]:
             weather_descr = item.name

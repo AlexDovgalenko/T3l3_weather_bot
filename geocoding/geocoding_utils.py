@@ -1,13 +1,12 @@
 """Module contains data to work with positionstack.com API resource."""
-import logging
+
 from dataclasses import dataclass
 from typing import Tuple, Optional, List
 
 import geocoder
+from loguru import logger
 
 from geocoding.geocoding_exceptions import GeneralGeocodingError, UnableToLocateCoordinates, GeocodingDataParseError
-
-logger = logging.getLogger()
 
 
 @dataclass

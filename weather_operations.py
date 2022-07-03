@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from typing import Tuple, Union
-
+from loguru import logger
 from general_symbols import GeneralEmojis
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToUpdateWeatherCache
 from weather_cache.weather_cache_utils import check_weather_cache, update_weather_cache
@@ -9,8 +9,6 @@ from weather_providers.weather_meteomatics import MeteomaticsStrategy
 from weather_providers.weather_openweathermap import OpenWeatherMapStrategy
 from weather_providers.weather_provider_exception import FailedFetchWeatherDataFromProvider
 from weather_providers.weather_provider_strategy import WeatherData, WeatherProviderName, WeatherForecastType
-
-logger = logging.getLogger()
 
 WEATHER_PROVIDER_STRATEGY_DICT = {WeatherProviderName.OPENWEATHERMAP.value: OpenWeatherMapStrategy(),
                                   WeatherProviderName.METEOMATICS.value: MeteomaticsStrategy()}
@@ -20,6 +18,7 @@ def return_current_weather_data(weather_provider_name: str, city_name: str,
                                 timestamp: int, period: WeatherForecastType, lat_lon: str) -> Tuple[
     Union[WeatherData, str], bool]:
     """Function checks if weather data for provided weather provider, forecast period and coordinates present in the DB."""
+    logger.info("Checking weather cache ...")
     try:
         result, cached_data = check_weather_cache(period=period.CURRENT,
                                                   weather_provider_name=weather_provider_name,
