@@ -46,18 +46,16 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
             return None
         return json.loads(response.text), "-".join([latitude, longitude])
 
-    def fetch_weather_data(self, lat_lon: str, city_name: str,
-                           period_option: WeatherForecastType = WeatherForecastType.CURRENT) -> Optional[
-        WeatherData]:
+    def fetch_weather_data(self, lat_lon: str, city_name: str, period: WeatherForecastType) -> Optional[WeatherData]:
 
         response = self._get_weather_response(lat_lon=lat_lon)
 
         if not response:
             return None
         else:
-            if period_option is WeatherForecastType.CURRENT:
+            if period is WeatherForecastType.CURRENT:
                 weather_data = self._parse_current_weather(city_name, weather_response=response)
-            elif WeatherForecastType.FIVE_DAYS:
+            elif period in [WeatherForecastType.FIVE_DAYS]:
                 weather_data = self._parse_weather_forecast(city_name, weather_response=response)
             else:
                 logger.error(f"Incorrect 'period_option' waw passed, possible options are:{list(WeatherForecastType)}")
@@ -108,7 +106,7 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
                 weather_code=weather_response[0]["current"]["weather"][0].get("id")
             )
             weather_data_list = []
-            for item in range(1, 6):
+            for item in range(6):
                 weather_data = WeatherData(
                     city_name=city_name,
                     lat_lon=weather_response[1],

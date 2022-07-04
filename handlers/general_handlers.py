@@ -40,6 +40,7 @@ async def general_text_handler(message: types.Message, state=None):
     else:
         async with state.proxy() as data:
             data['lat_lon'] = available_location_options[0].lat_lon
+            data["address"] = available_location_options[0].address
         keyboard = weather_forecast_type_keyboard()
         await message.reply(text=message_text, reply_markup=keyboard, allow_sending_without_reply=True)
         await FSMWeatherConditions.forecast_type.set()
