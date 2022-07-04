@@ -80,9 +80,9 @@ def update_weather_item_in_db(weather_provider_name: str, timestamp: int, period
 
 
 def check_weather_cache(weather_provider_name: str, timestamp: int, period: WeatherForecastType, lat_lon: str) -> Tuple[
-    bool, Optional[tuple]]:
+        bool, Optional[tuple]]:
     """Function checks if combination of location latitude and longitude + weather provider record already exists in DB,
-    and it is more than one hour old.
+    and it is not more than one hour old.
      Returns """
     logger.info(
         f"Checking whether record with lat_lon '{lat_lon}', weather provider '{weather_provider_name}' "
@@ -95,11 +95,11 @@ def check_weather_cache(weather_provider_name: str, timestamp: int, period: Weat
         logger.error(err)
         raise FailedToCheckWeatherCache(err)
     if not result:
-        # TODO Raise appropriate exception here
-        logger.info(f"Record is not present in the DB.")
+        logger.info("Record is not present in the DB.")
         return False, None
+    logger.info("Record is present in the DB.")
     is_cache_actual = check_time_frame(db_timestamp=result[3], current_timestamp=timestamp)
-    logger.info(f"Record {result} is actual: {is_cache_actual}")
+    logger.info(f"Record's cached data is actual: {is_cache_actual}")
     return is_cache_actual, result
 
 

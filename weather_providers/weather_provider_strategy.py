@@ -48,9 +48,8 @@ class WeatherProviderStrategy(ABC):
         """
 
     @abstractmethod
-    def fetch_weather_data(self, lat_lon: str, city_name: str,
-                           period_option: "WeatherForecastType" = WeatherForecastType.CURRENT) -> \
-            Union["WeatherData", str]:
+    def fetch_weather_data(self, lat_lon: str, city_name: str, period_option: "WeatherForecastType") -> Union[
+        "WeatherData", str]:
         pass
 
     @abstractmethod
