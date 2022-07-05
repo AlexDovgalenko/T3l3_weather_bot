@@ -33,14 +33,14 @@ class MeteomaticsStrategy(WeatherProviderStrategy):
         return response.json()
 
     def fetch_weather_data(self, lat_lon: str, city_name: str,
-                           period_option: WeatherForecastType = WeatherForecastType.CURRENT) -> Union[
+                           period: WeatherForecastType) -> Union[
         WeatherData, str]:
         pass
 
     def _parse_current_weather(self, city_name, weather_response: dict):
         pass
 
-    def _parse_weather_forecast(self, city_name, weather_response: dict):
+    def _parse_weather_forecast(self, city_name, weather_response: dict, period: WeatherForecastType):
         pass
 
 
