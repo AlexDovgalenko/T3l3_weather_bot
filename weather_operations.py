@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from loguru import logger
 from weather_cache.weather_cache_exceptions import FailedToCheckWeatherCache, FailedToUpdateWeatherCache
 from weather_cache.weather_cache_utils import check_weather_cache, update_weather_cache
@@ -12,7 +12,7 @@ WEATHER_PROVIDER_STRATEGY_DICT = {WeatherProviderName.OPENWEATHERMAP.value: Open
                                   WeatherProviderName.METEOMATICS.value: MeteomaticsStrategy()}
 
 WEATHER_DODY_TEMPLATE_DICT = {
-    "date": "<b>Погода на:</b> \t<date>\n=================================",
+    "date": "<b>Погода на:</b> \t<date>\n==================================",
     "weather_emoji": "<b>Погода</b>:\t<weather_emoji>\t<weather_summary>",
     "max_temperature": "<b>Максимальна температура повітря</b>:\t<max_temperature> С°",
     "min_temperature": "<b>Мінімальна температура повітря</b>:\t<min_temperature> С°",
@@ -25,23 +25,23 @@ WEATHER_DODY_TEMPLATE_DICT = {
 }
 
 
-def compile_weather_output(lat_lon: str, weather_provider_name: str, forecast_type: WeatherForecastType,
-                           city_name: str):
+def compile_weather_output(lat_lon: str, weather_provider_name: str, forecast_type: str, city_name: str) -> str:
     """Returns HTML pre-formatted weather output for requested location, weather provider and coordinates,
     based on weather forecast type."""
-    if forecast_type == WeatherForecastType.CURRENT.value:
-        return __compile_current_weather_output(weather_provider_name=weather_provider_name, lat_lon=lat_lon,
-                                                city_name=city_name)
-    elif forecast_type == WeatherForecastType.FIVE_DAYS.value:
-        return __compile_5d_forecast_weather_output(weather_provider_name=weather_provider_name, lat_lon=lat_lon,
-                                                    city_name=city_name)
-    else:
+    period = WeatherForecastType(forecast_type)
+    try:
+        compilled_weather_output = __get_and_update_weather(weather_provider_name=weather_provider_name,
+                                                            lat_lon=lat_lon,
+                                                            city_name=city_name, period=period)
+        return compilled_weather_output
+    except Exception:
         raise RuntimeError(
             f"Unable to compile weather output for the following options:\nWeather provider: {weather_provider_name}"
             f"\nCity name: {city_name}\nLatitude and Longitude: {lat_lon}")
 
 
-def __compile_current_weather_output(weather_provider_name: str, lat_lon: str, city_name: str) -> str:
+def __get_and_update_weather(weather_provider_name: str, lat_lon: str, city_name: str,
+                             period: WeatherForecastType) -> str:
     """Returns current weather HTML pre-formatted weather output for requested location, weather provider and
     coordinates.
 
@@ -51,41 +51,29 @@ def __compile_current_weather_output(weather_provider_name: str, lat_lon: str, c
     In case if it is failed to get weather data - returns text message with corresponding error.
     """
     now = datetime.now()
-    date_time_hrs = now.strftime("%Y-%m-%d %H:%M")
     weather_data, needs_cache_update = __return_weather_data(weather_provider_name=weather_provider_name,
                                                              city_name=city_name,
                                                              timestamp=int(now.timestamp()),
-                                                             period=WeatherForecastType.CURRENT,
+                                                             period=period,
                                                              lat_lon=lat_lon)
 
     if isinstance(weather_data, tuple):
         text = weather_data[4]
         return text
 
-    elif isinstance(weather_data, WeatherData):
-        text = __compile_weather_string(weather_data, period=WeatherForecastType.CURRENT)
-        # text = f"<b>** {weather_data.city_name} **</b> \n" \
-        #        f"<b>Поточна погода на:</b> \t{date_time_hrs}\n" \
-        #        f"==========================\n" \
-        #        f"<b>Погода</b>:\t{weather_data.weather_emoji}\t{weather_data.weather_summary}\n" \
-        #        f"<b>Температура повітря</b>:\t{weather_data.temperature} С°\n" \
-        #        f"<b>Швидкість вітру</b>:\t{weather_data.wind_speed} м/с\t{weather_data.wind_direction}\n" \
-        #        f"<b>Атмосферний тиск</b>:\t{weather_data.pressure} мм рт.ст.\n" \
-        #        f"<b>Відносна вологість </b>:\t{weather_data.humidity} %\n" \
-        #        f"<b>Схід сонця</b>: {weather_data.sunrise}\n<b>Захід сонця</b>: {weather_data.sunset}"
-
+    elif isinstance(weather_data, (WeatherData, list)):
+        text = __compile_weather_string(weather_data, period=period)
         try:
-            update_weather_cache(lat_lon=weather_data.lat_lon, current_weather_data=text,
-                                 period=WeatherForecastType.CURRENT,
-                                 weather_provider_name=weather_provider_name,
-                                 timestamp=int(weather_data.timestamp))
+            update_weather_cache(
+                lat_lon=weather_data[0].lat_lon if isinstance(weather_data, list) else weather_data.lat_lon,
+                current_weather_data=text,
+                period=period,
+                weather_provider_name=weather_provider_name,
+                timestamp=int(weather_data[0].timestamp)) if isinstance(weather_data, list) else int(
+                weather_data.timestamp)
         except FailedToUpdateWeatherCache as err:
             logger.error(err)
         return text
-
-
-def __compile_5d_forecast_weather_output(lat_lon: str, weather_provider_name: str, city_name: str) -> str:
-    raise NotImplementedError("This option is in development phase...")
 
 
 def __return_weather_data(weather_provider_name: str, city_name: str, timestamp: int, period: WeatherForecastType,
@@ -129,17 +117,34 @@ def __build_weather_string_list(weather_data: WeatherData):
     return weather_body_list
 
 
-# TODO remove this method if it will not be needed in dayly or 5d forecast string compillation
+def __compile_weather_string(weather_data: Union[WeatherData, List[WeatherData]], period: WeatherForecastType):
+    if isinstance(weather_data, WeatherData):
+        weather_header_template = "<b>** <city_name> **</b>\n".replace("<city_name>", str(weather_data.city_name))
+        weather_body_list = __build_weather_string_list(weather_data=weather_data)
+        weather_body_string = "\n".join(weather_body_list)
+        for key, value in weather_data.__dict__.items():
+            if key in weather_body_string:
+                if key == "date" and period == WeatherForecastType.CURRENT:
+                    weather_body_string = weather_body_string.replace(f"<{key}>",
+                                                                      str(datetime.now().strftime("%Y-%m-%d %H:%M")))
+                weather_body_string = weather_body_string.replace(f"<{key}>", str(value))
+        final_weather_string = "\n".join((weather_header_template, weather_body_string))
+        return f"{final_weather_string}\n=================================="
 
-def __compile_weather_string(weather_data: WeatherData, period: WeatherForecastType):
-    weather_header_template = "<b>** <city_name> **</b>\n".replace("<city_name>", str(weather_data.city_name))
-    weather_body_list = __build_weather_string_list(weather_data=weather_data)
-    weather_body_string = "\n".join(weather_body_list)
-    for key, value in weather_data.__dict__.items():
-        if key in weather_body_string:
-            if key == "date" and period == WeatherForecastType.CURRENT:
-                weather_body_string = weather_body_string.replace(f"<{key}>",
-                                                                  str(datetime.now().strftime("%Y-%m-%d %H:%M")))
-        weather_body_string = weather_body_string.replace(f"<{key}>", str(value))
-    final_weather_string = "\n".join((weather_header_template, weather_body_string))
-    return f"{final_weather_string}\n================================="
+    if isinstance(weather_data, list):
+        weather_header_template = "<b>** <city_name> **</b>\n".replace("<city_name>", str(weather_data[0].city_name))
+        weather_body_string = __build_string_body_from_list(weather_data=weather_data)
+        final_weather_string = "\n".join((weather_header_template, weather_body_string))
+        return final_weather_string
+
+
+def __build_string_body_from_list(weather_data: List[WeatherData]) -> str:
+    final_string = ""
+    for item in weather_data:
+        weather_body_list = __build_weather_string_list(weather_data=item)
+        weather_body_string = "\n".join(weather_body_list)
+        for key, value in item.__dict__.items():
+            if key in weather_body_string:
+                weather_body_string = weather_body_string.replace(f"<{key}>", str(value))
+        final_string += f"{weather_body_string}\n==================================\n\n"
+    return final_string

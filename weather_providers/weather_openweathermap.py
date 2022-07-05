@@ -56,9 +56,10 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
             if period is WeatherForecastType.CURRENT:
                 weather_data = self._parse_current_weather(city_name, weather_response=response)
             elif period in [WeatherForecastType.FIVE_DAYS]:
-                weather_data = self._parse_weather_forecast(city_name, weather_response=response)
+                weather_data = self._parse_weather_forecast(city_name, weather_response=response, period=period)
             else:
-                logger.error(f"Incorrect 'period_option' waw passed, possible options are:{list(WeatherForecastType)}")
+                logger.error(f"Incorrect 'period' parameter waw passed '{period}', possible options are:\n"
+                             f"{list(WeatherForecastType)}")
                 return None
         if not weather_data:
             return None
@@ -99,14 +100,16 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
             return None
         return weather_data
 
-    def _parse_weather_forecast(self, city_name, weather_response: Tuple[dict, str]) -> Optional[List[WeatherData]]:
+    def _parse_weather_forecast(self, city_name, weather_response: Tuple[dict, str], period: WeatherForecastType) -> \
+            Optional[List[WeatherData]]:
         try:
-            emoji_data = get_weather_emojy(
-                weather_provider_name=self.provider_name,
-                weather_code=weather_response[0]["current"]["weather"][0].get("id")
-            )
+
             weather_data_list = []
-            for item in range(6):
+            for item in range(7):
+                emoji_data = get_weather_emojy(
+                    weather_provider_name=self.provider_name,
+                    weather_code=weather_response[0]['daily'][item]["weather"][0].get("id")
+                )
                 weather_data = WeatherData(
                     city_name=city_name,
                     lat_lon=weather_response[1],
@@ -133,4 +136,5 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
         except Exception as err:
             logger.error(f"Failed to parse weather response because of following error:\n{err}")
             return None
-        return weather_data_list
+        if period == WeatherForecastType.FIVE_DAYS:
+            return weather_data_list[1:6]

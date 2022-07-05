@@ -57,5 +57,5 @@ class WeatherProviderStrategy(ABC):
         pass
 
     @abstractmethod
-    def _parse_weather_forecast(self, city_name, weather_response: dict):
+    def _parse_weather_forecast(self, city_name, weather_response: dict, period: WeatherForecastType):
         pass
