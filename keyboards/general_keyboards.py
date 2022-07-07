@@ -13,15 +13,17 @@ if TYPE_CHECKING:
 def weather_forecast_type_keyboard() -> "InlineKeyboardMarkup":
     """Represents keyboard with available weather output options
 
-    Currently, only 2 options available: 'current weather' and '5 days forecast'
+    Currently, only 3 options available: 'current weather', 'today's weather' and '5 days forecast'
     :return: InlineKeyboardMarkup --> Inline keyboard containing possible forecast options
     """
-    current_forecast = InlineKeyboardButton(text="Поточна погода",
+    current_forecast = InlineKeyboardButton(text="Зараз",
                                             callback_data=WeatherForecastType.CURRENT.value)
-    five_days_forecast = InlineKeyboardButton(text="Прогноз на 5 днів",
+    today_forecast = InlineKeyboardButton(text="На день",
+                                              callback_data=WeatherForecastType.TODAY.value)
+    five_days_forecast = InlineKeyboardButton(text="На 5 днів",
                                               callback_data=WeatherForecastType.FIVE_DAYS.value)
     keyboard = types.InlineKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(current_forecast, five_days_forecast)
+    keyboard.add(current_forecast, today_forecast, five_days_forecast)
     return keyboard
 
 

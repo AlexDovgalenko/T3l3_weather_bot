@@ -13,6 +13,7 @@ class WeatherProviderName(Enum):
 class WeatherForecastType(Enum):
     CURRENT = "_forecast_weather_current"
     FIVE_DAYS = "_forecast_weather_five_days"
+    TODAY = "_forecast_weather_today"
 
 
 @dataclass

@@ -62,6 +62,7 @@ async def weather_choice_handler(callback_query: types.CallbackQuery, state=FSMC
     """Handles user choice of weather forecast on FSMWeatherConditions.forecast_type state."""
     chat_id = callback_query.message.chat.id
     user_data = get_user_data(chat_id)
+    await callback_query.message.delete_reply_markup()
     async with state.proxy() as data:
         data['forecast_type'] = callback_query.data
     weather_options = data._data
