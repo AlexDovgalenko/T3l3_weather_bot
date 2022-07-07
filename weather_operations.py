@@ -14,6 +14,7 @@ WEATHER_PROVIDER_STRATEGY_DICT = {WeatherProviderName.OPENWEATHERMAP.value: Open
 WEATHER_DODY_TEMPLATE_DICT = {
     "date": "<b>Погода на:</b> \t<date>\n==================================",
     "weather_emoji": "<b>Погода</b>:\t<weather_emoji>\t<weather_summary>",
+    "temperature": "<b>Температура повітря</b>:\t<temperature> С°",
     "max_temperature": "<b>Максимальна температура повітря</b>:\t<max_temperature> С°",
     "min_temperature": "<b>Мінімальна температура повітря</b>:\t<min_temperature> С°",
     "wind_speed": "<b>Швидкість вітру</b>:\t<wind_speed> м/с\t<wind_direction>",

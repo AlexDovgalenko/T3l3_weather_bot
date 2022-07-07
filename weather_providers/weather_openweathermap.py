@@ -55,7 +55,7 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
         else:
             if period is WeatherForecastType.CURRENT:
                 weather_data = self._parse_current_weather(city_name, weather_response=response)
-            elif period in [WeatherForecastType.FIVE_DAYS]:
+            elif period in [WeatherForecastType.FIVE_DAYS, WeatherForecastType.TODAY]:
                 weather_data = self._parse_weather_forecast(city_name, weather_response=response, period=period)
             else:
                 logger.error(f"Incorrect 'period' parameter waw passed '{period}', possible options are:\n"
@@ -138,3 +138,5 @@ class OpenWeatherMapStrategy(WeatherProviderStrategy):
             return None
         if period == WeatherForecastType.FIVE_DAYS:
             return weather_data_list[1:6]
+        elif period == WeatherForecastType.TODAY:
+            return [weather_data_list[0]]
